@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WildBurn Restaurant QR Landing">
+    <title>Welcome</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 배경 레이어 */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        /* 로딩 상태 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container.active {
+            display: flex;
+        }
+
+        /* 콘텐츠 박스 */
+        .content-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 로고 */
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .shop-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        /* 환영 문구 */
+        .welcome-text {
+            text-align: center;
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        /* 버튼 컨테이너 */
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            gap: 10px;
+        }
+
+        .btn i {
+            font-size: 1.3rem;
+        }
+
+        /* 메뉴판 버튼 */
+        .btn-menu {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-menu:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* SNS 버튼 */
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+        }
+
+        .btn-tiktok {
+            background: linear-gradient(135deg, #000000 0%, #25F4EE 100%);
+            color: white;
+        }
+
+        .btn-instagram:hover,
+        .btn-tiktok:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 푸터 */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        /* 에러 메시지 */
+        .error-box {
+            display: none;
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #c33;
+            text-align: center;
+        }
+
+        /* 반응형 */
+        @media (max-width: 600px) {
+            .content-box {
+                padding: 30px 20px;
+            }
+
+            .shop-name {
+                font-size: 1.6rem;
+            }
+
+            .welcome-text {
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                font-size: 1rem;
+                padding: 14px 20px;
+            }
+        }
+
+        /* 숨김 클래스 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 배경 -->
+    <div class="background" id="background"></div>
+
+    <!-- 로딩 -->
+    <div class="loading" id="loading">
+        <i class="fas fa-spinner"></i>
+        <span>Loading...</span>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container" id="container">
+        <div class="content-box">
+            <!-- 에러 메시지 -->
+            <div class="error-box" id="errorBox"></div>
+
+            <!-- 로고 -->
+            <div class="logo">
+                <img id="logoImg" src="" alt="Logo" style="display: none;">
+                <h1 class="shop-name" id="shopName">Welcome</h1>
+            </div>
+
+            <!-- 환영 문구 -->
+            <p class="welcome-text" id="welcomeText"></p>
+
+            <!-- 버튼들 -->
+            <div class="buttons">
+                <!-- 메뉴판 -->
+                <a href="#" class="btn btn-menu" id="btnMenu" style="display: none;">
+                    <i class="fas fa-utensils"></i>
+                    <span>메뉴판 보기</span>
+                </a>
+
+                <!-- SNS -->
+                <div class="social-buttons">
+                    <a href="#" class="btn btn-instagram" id="btnInstagram" style="display: none;">
+                        <i class="fab fa-instagram"></i>
+                        <span>Instagram</span>
+                    </a>
+                    <a href="#" class="btn btn-tiktok" id="btnTiktok" style="display: none;">
+                        <i class="fab fa-tiktok"></i>
+                        <span>TikTok</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 푸터 -->
+            <div class="footer">
+                <p>© 2025 YKH Holdings. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================================
+        // 설정
+        // ====================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyk-NTMacpKjauAlI52SOnNvrEnSEe_cG7qqp5Cq9KF0OzeQyKuABg2fm3ezE8e3UY7bg/exec';
+        
+        // ====================================
+        // 유틸리티
+        // ====================================
+        function getURLParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function getOrCreateSessionId() {
+            let sessionId = localStorage.getItem('wildburn_session_id');
+            if (!sessionId) {
+                sessionId = generateSessionId();
+                localStorage.setItem('wildburn_session_id', sessionId);
+            }
+            return sessionId;
+        }
+
+        function isReturningVisitor() {
+            return localStorage.getItem('wildburn_visited') === 'true';
+        }
+
+        function markAsVisited() {
+            localStorage.setItem('wildburn_visited', 'true');
+        }
+
+        // ====================================
+        // 디바이스 정보 수집
+        // ====================================
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            
+            let deviceType = 'Desktop';
+            if (/mobile/i.test(ua)) deviceType = 'Mobile';
+            else if (/tablet|ipad/i.test(ua)) deviceType = 'Tablet';
+            
+            let os = 'Unknown';
+            if (/windows/i.test(ua)) os = 'Windows';
+            else if (/mac/i.test(ua)) os = 'MacOS';
+            else if (/android/i.test(ua)) os = 'Android';
+            else if (/ios|iphone|ipad/i.test(ua)) os = 'iOS';
+            
+            let browser = 'Unknown';
+            if (/chrome/i.test(ua) && !/edg/i.test(ua)) browser = 'Chrome';
+            else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = 'Safari';
+            else if (/firefox/i.test(ua)) browser = 'Firefox';
+            else if (/edg/i.test(ua)) browser = 'Edge';
+            
+            return {
+                device_type: deviceType,
+                os: os,
+                browser: browser,
+                screen_resolution: `${window.screen.width}x${window.screen.height}`,
+                user_agent: ua,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+        }
+
+        // ====================================
+        // API 호출
+        // ====================================
+        async function fetchShopSettings(shopId) {
+            const url = `${API_URL}?action=get-settings&shop_id=${shopId}`;
+            const response = await fetch(url);
+            return await response.json();
+        }
+
+        async function logVisit(shopId, deviceInfo) {
+            const visitData = {
+                shop_id: shopId,
+                session_id: getOrCreateSessionId(),
+                is_returning: isReturningVisitor(),
+                ...deviceInfo,
+                country: '',
+                city: '',
+                referrer: document.referrer || 'direct',
+                utm_source: getURLParam('utm_source') || '',
+                utm_medium: getURLParam('utm_medium') || '',
+                utm_campaign: getURLParam('utm_campaign') || ''
+            };
+            
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'log-visit',
+                        visit_data: visitData
+                    })
+                });
+                markAsVisited();
+            } catch (error) {
+                console.error('Visit logging failed:', error);
+            }
+        }
+
+        async function logClick(shopId, buttonName, buttonLabel, targetUrl) {
+            const clickData = {
+                session_id: getOrCreateSessionId(),
+                shop_id: shopId,
+                button_name: buttonName,
+                button_label: buttonLabel,
+                target_url: targetUrl,
+                time_on_page: Math.floor((Date.now() - window.pageLoadTime) / 1000)
+            };
+            
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'log-click',
+                        click_data: clickData
+                    })
+                });
+            } catch (error) {
+                console.error('Click logging failed:', error);
+            }
+        }
+
+        // ====================================
+        // UI 업데이트
+        // ====================================
+        function updateUI(settings) {
+            const data = settings.data;
+            
+            // 배경색
+            document.getElementById('background').style.backgroundColor = data.bg_color || '#1a1a1a';
+            
+            // 배경 이미지
+            if (data.bg_image_url) {
+                document.getElementById('background').style.backgroundImage = `url(${data.bg_image_url})`;
+            }
+            
+            // 로고
+            if (data.logo_url) {
+                const logoImg = document.getElementById('logoImg');
+                logoImg.src = data.logo_url;
+                logoImg.style.display = 'block';
+            }
+            
+            // 샵 이름
+            document.getElementById('shopName').textContent = data.shop_name;
+            
+            // 환영 문구
+            document.getElementById('welcomeText').textContent = data.welcome_text;
+            
+            // 메뉴판 버튼
+            if (data.menu_pdf_url) {
+                const btnMenu = document.getElementById('btnMenu');
+                btnMenu.href = data.menu_pdf_url;
+                btnMenu.target = '_blank';
+                btnMenu.style.display = 'flex';
+                btnMenu.onclick = () => logClick(data.shop_id, 'view_menu', '메뉴판 보기', data.menu_pdf_url);
+            }
+            
+            // Instagram 버튼
+            if (data.instagram_url) {
+                const btnInstagram = document.getElementById('btnInstagram');
+                btnInstagram.href = data.instagram_url;
+                btnInstagram.target = '_blank';
+                btnInstagram.style.display = 'flex';
+                btnInstagram.onclick = () => logClick(data.shop_id, 'instagram', 'Instagram', data.instagram_url);
+            }
+            
+            // TikTok 버튼
+            if (data.tiktok_url) {
+                const btnTiktok = document.getElementById('btnTiktok');
+                btnTiktok.href = data.tiktok_url;
+                btnTiktok.target = '_blank';
+                btnTiktok.style.display = 'flex';
+                btnTiktok.onclick = () => logClick(data.shop_id, 'tiktok', 'TikTok', data.tiktok_url);
+            }
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.textContent = message;
+            errorBox.style.display = 'block';
+        }
+
+        // ====================================
+        // 초기화
+        // ====================================
+        async function init() {
+            window.pageLoadTime = Date.now();
+            
+            // URL에서 shop_id 가져오기
+            const shopId = getURLParam('shop') || 'bada';
+            
+            try {
+                // 샵 설정 로드
+                const settings = await fetchShopSettings(shopId);
+                
+                if (!settings.success) {
+                    throw new Error(settings.error || 'Failed to load settings');
+                }
+                
+                // UI 업데이트
+                updateUI(settings);
+                
+                // 방문 로그
+                const deviceInfo = getDeviceInfo();
+                await logVisit(shopId, deviceInfo);
+                
+                // 로딩 숨기고 컨텐츠 표시
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('container').classList.add('active');
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('페이지를 불러오는 중 오류가 발생했습니다.');
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('container').classList.add('active');
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
